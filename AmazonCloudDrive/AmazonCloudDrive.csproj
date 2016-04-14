@@ -82,7 +82,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="ACDDokanNet.pfx" />
     <None Include="CloudHold.pfx" />
     <None Include="packages.config" />
     <None Include="stylecop.json" />

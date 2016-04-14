@@ -3,7 +3,7 @@
     using System;
     using System.Threading;
 
-    public abstract class AbstractBlockStream : IBlockStream
+    public abstract class AbstractReaderWriter : IBlockReaderWriter
     {
         private int closed = 0;
 

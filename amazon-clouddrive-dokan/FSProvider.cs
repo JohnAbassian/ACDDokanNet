@@ -225,7 +225,7 @@
             itemsTreeCache.Add(node.FilePath(filePath).Build());
         }
 
-        public IBlockStream OpenFile(string filePath, FileMode mode, FileAccess fileAccess, FileShare share, FileOptions options)
+        public IBlockReaderWriter OpenFile(string filePath, FileMode mode, FileAccess fileAccess, FileShare share, FileOptions options)
         {
             var item = GetItem(filePath);
             if (fileAccess == FileAccess.Read)

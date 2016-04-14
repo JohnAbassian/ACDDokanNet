@@ -60,7 +60,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="ACDDokanNet.pfx" />
     <None Include="app.config" />
     <None Include="CloudHold.pfx" />
     <None Include="packages.config" />

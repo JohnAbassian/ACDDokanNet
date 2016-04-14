@@ -193,7 +193,7 @@
             access.TryAdd(item.Id, new CacheEntry { Id = item.Id, AccessTime = DateTime.UtcNow });
         }
 
-        public IBlockStream OpenReadWithDownload(FSItem item)
+        public IBlockReaderWriter OpenReadWithDownload(FSItem item)
         {
             var path = Path.Combine(cachePath, item.Id);
             StartDownload(item, path);
@@ -233,11 +233,9 @@
                         await cloud.Files.Download(item.Id, fileOffset: writer.Length, streammer: async (stream) =>
                         {
                             int red = 0;
-                            long totalred = 0;
                             do
                             {
-                                red = await stream.ReadAsync(buf, 0, buf.Length);
-                                totalred += red;
+                                red = await stream.ReadAsync(buf, 0, buf.Length).ConfigureAwait(false);
                                 if (writer.Length == 0)
                                 {
                                     Log.Trace("Got first part: " + item.Id + " in " + start.ElapsedMilliseconds);
@@ -247,11 +245,10 @@
                                 downloader.Downloaded = writer.Length;
                             }
                             while (red > 0);
-                            return totalred;
-                        });
+                        }).ConfigureAwait(false);
                         if (writer.Length < item.Length)
                         {
-                            await Task.Delay(500);
+                            await Task.Delay(500).ConfigureAwait(false);
                         }
                     }
 

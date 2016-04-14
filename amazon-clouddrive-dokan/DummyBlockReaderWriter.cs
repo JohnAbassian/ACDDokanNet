@@ -1,6 +1,6 @@
 ﻿namespace Azi.Cloud.DokanNet
 {
-    public class DummyBlockStream : AbstractBlockStream
+    public class DummyBlockReaderWriter : AbstractReaderWriter
     {
         public override void Flush()
         {

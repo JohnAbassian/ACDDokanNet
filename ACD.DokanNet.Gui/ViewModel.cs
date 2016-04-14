@@ -3,7 +3,9 @@
     using System;
     using System.Collections.ObjectModel;
     using System.ComponentModel;
+    using System.Diagnostics.Contracts;
     using System.Reflection;
+    using System.Runtime.CompilerServices;
     using System.Threading;
 
     public class ViewModel : INotifyPropertyChanged, IDisposable

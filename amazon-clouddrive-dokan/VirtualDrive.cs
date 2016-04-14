@@ -28,7 +28,7 @@
         private const FileAccess DataReadAccess = FileAccess.ReadData | FileAccess.GenericExecute |
                                                    FileAccess.Execute;
 
-        private static readonly Regex StreamNameGroupsRegex = new Regex(@"([^,])+(?:,([^,]*))*");
+        private static readonly Regex StreamNameGroupsRegex = new Regex(@"([^,]+)(?:,([^,]*))*");
 
 #if TRACE
         private string lastFilePath;
@@ -86,7 +86,7 @@
             {
                 if (info.Context != null)
                 {
-                    var str = info.Context as IBlockStream;
+                    var str = info.Context as IBlockReaderWriter;
                     if (str != null)
                     {
                         str.Close();
@@ -191,13 +191,46 @@
             }
         }
 
+        public NtStatus FindFilesWithPattern(string fileName, string searchPattern, out IList<FileInformation> files, DokanFileInfo info)
+        {
+            if (!HasAccess(info))
+            {
+                files = null;
+                return DokanResult.AccessDenied;
+            }
+
+            try
+            {
+                var wildcardRegex = new Regex("^" + Regex.Escape(searchPattern).Replace(@"\*", ".*").Replace(@"\?", ".") + "$");
+                var items = provider.GetDirItems(fileName).Result;
+
+                files = items.Where(i => wildcardRegex.IsMatch(i.Name)).Select(i => new FileInformation
+                {
+                    Length = i.Length,
+                    FileName = i.Name,
+                    Attributes = i.IsDir ? FileAttributes.Directory : FileAttributes.Normal,
+                    LastAccessTime = i.LastAccessTime,
+                    LastWriteTime = i.LastWriteTime,
+                    CreationTime = i.CreationTime
+                }).ToList();
+                return DokanResult.Success;
+            }
+            catch (Exception e)
+            {
+                Log.Error(e);
+                files = new List<FileInformation>();
+                return DokanResult.Error;
+            }
+        }
+
+
         public NtStatus FlushFileBuffers(string fileName, DokanFileInfo info)
         {
             try
             {
                 if (info.Context != null)
                 {
-                    (info.Context as IBlockStream)?.Flush();
+                    (info.Context as IBlockReaderWriter)?.Flush();
                 }
 
                 return DokanResult.Success;
@@ -452,7 +485,7 @@
             var start = DateTime.UtcNow;
             try
             {
-                var reader = info.Context as IBlockStream;
+                var reader = info.Context as IBlockReaderWriter;
 
                 bytesRead = reader.Read(offset, buffer, 0, buffer.Length, ReadTimeout);
                 return DokanResult.Success;
@@ -501,7 +534,7 @@
             }
 
             // Log.Trace(fileName);
-            var file = info.Context as IBlockStream;
+            var file = info.Context as IBlockReaderWriter;
             file.SetLength(length);
             Log.Trace($"{fileName} to {length}");
 
@@ -547,10 +580,7 @@
             return DokanResult.Success;
         }
 
-        public NtStatus Unmount(DokanFileInfo info)
-        {
-            return DokanResult.Success;
-        }
+        public NtStatus Unmount(DokanFileInfo info) => DokanResult.Success;
 
         public NtStatus WriteFile(string fileName, byte[] buffer, out int bytesWritten, long offset, DokanFileInfo info)
         {
@@ -564,7 +594,7 @@
             {
                 if (info.Context != null)
                 {
-                    var writer = info.Context as IBlockStream;
+                    var writer = info.Context as IBlockReaderWriter;
                     if (writer != null)
                     {
                         writer.Write(offset, buffer, 0, buffer.Length);
@@ -659,7 +689,7 @@
         {
             Log.Trace($"Opening alternate stream {fileName}:{streamName}");
 
-            var streamNameGroups = StreamNameGroupsRegex.Match(streamName).Groups.Cast<Group>().Skip(1).Select(g => g.Value).ToList();
+            var streamNameGroups = StreamNameGroupsRegex.Match(streamName).Groups.Cast<Group>().Skip(1).Select(g => g.Value).Where(s => !string.IsNullOrWhiteSpace(s)).ToList();
             switch (streamNameGroups[0])
             {
                 case CloudDokanNetItemInfo.StreamName:
@@ -699,7 +729,7 @@
 
         private NtStatus OpenAsDummyWrite(DokanFileInfo info)
         {
-            info.Context = new DummyBlockStream();
+            info.Context = new DummyBlockReaderWriter();
             return DokanResult.Success;
         }
 

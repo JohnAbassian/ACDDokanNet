@@ -178,7 +178,7 @@
                         VirtualDriveWrapper.Unmount((char)MountLetter);
                         unmountingEvent.Wait();
                     }
-                });
+                }).ConfigureAwait(false);
 
                 MountLetter = null;
             }

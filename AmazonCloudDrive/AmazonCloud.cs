@@ -240,11 +240,10 @@
             }
         }
 
-        async Task IHttpCloudFiles.Download(string id, Func<Stream, Task<long>> streammer, long? fileOffset, int? length)
+        async Task IHttpCloudFiles.Download(string id, Func<Stream, Task> streammer, long? fileOffset, int? length)
         {
             try
             {
-                long expectedOffset = fileOffset ?? 0;
                 await amazon.Files.Download(id, fileOffset: fileOffset, length: length, streammer: async (response) =>
                 {
                     var partial = response.StatusCode == HttpStatusCode.PartialContent;
@@ -252,7 +251,7 @@
                     if (partial)
                     {
                         contentRange = response.Headers.GetContentRange();
-                        if (contentRange.From != expectedOffset)
+                        if (contentRange.From != (fileOffset ?? 0))
                         {
                             throw new InvalidOperationException("Content range does not match request");
                         }
@@ -260,9 +259,9 @@
 
                     using (var stream = response.GetResponseStream())
                     {
-                        expectedOffset += await streammer(stream);
+                        await streammer(stream).ConfigureAwait(false);
                     }
-                });
+                }).ConfigureAwait(false);
             }
             catch (Exception ex)
             {

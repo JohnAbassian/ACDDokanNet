@@ -6,7 +6,7 @@
     using System.Threading;
     using Azi.Tools;
 
-    public class FileBlockReader : AbstractBlockStream
+    public class FileBlockReader : AbstractReaderWriter
     {
         private const int WaitForFile = 50;
 

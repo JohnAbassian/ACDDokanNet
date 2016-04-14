@@ -2,7 +2,7 @@
 {
     using System;
 
-    internal class ByteArrayBlockReader : AbstractBlockStream
+    internal class ByteArrayBlockReader : AbstractReaderWriter
     {
         private byte[] data;
 

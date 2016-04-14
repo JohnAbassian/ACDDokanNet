@@ -7,7 +7,7 @@
     using Azi.Cloud.Common;
     using Azi.Tools;
 
-    public class SmallFileBlockReaderWriter : AbstractBlockStream
+    public class SmallFileBlockReaderWriter : AbstractReaderWriter
     {
         private const int WaitForFile = 50;
 

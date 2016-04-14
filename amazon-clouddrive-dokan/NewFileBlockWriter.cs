@@ -5,7 +5,7 @@
     using Azi.Cloud.Common;
     using Azi.Tools;
 
-    public class NewFileBlockWriter : AbstractBlockStream
+    public class NewFileBlockWriter : AbstractReaderWriter
     {
         private readonly FSItem item;
         private readonly FileStream writer;

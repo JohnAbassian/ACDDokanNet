@@ -8,12 +8,12 @@
     using Azi.Cloud.Common;
     using Azi.Tools;
 
-    public class BufferedHttpCloudBlockReader : AbstractBlockStream
+    public class BufferedHttpCloudBlockReader : AbstractReaderWriter
     {
         private const int BlockSize = 1 * 1024 * 1024;
         private const int KeepLastBlocks = 5;
 
-        private readonly ConcurrentDictionary<long, Block> blocks = new ConcurrentDictionary<long, Block>(5, KeepLastBlocks * 5);
+        private readonly ConcurrentDictionary<long, Block> cachedBlocks = new ConcurrentDictionary<long, Block>(5, KeepLastBlocks * 5);
         private IHttpCloud cloud;
         private FSItem item;
         private long lastBlock = 0;
@@ -126,14 +126,14 @@
                 long blockcopy = block;
                 tasks.Add(Task.Run(() =>
                 {
-                    var b = blocks.GetOrAdd(blockcopy, DownloadBlock);
+                    var b = cachedBlocks.GetOrAdd(blockcopy, DownloadBlock);
                     b.Access = DateTime.UtcNow;
 
-                    while (blocks.Count > KeepLastBlocks)
+                    while (cachedBlocks.Count > KeepLastBlocks)
                     {
-                        var del = blocks.Values.Aggregate((curMin, x) => (curMin == null || (x.Access < curMin.Access)) ? x : curMin);
+                        var del = cachedBlocks.Values.Aggregate((curMin, x) => (curMin == null || (x.Access < curMin.Access)) ? x : curMin);
                         Block remove;
-                        blocks.TryRemove(del.N, out remove);
+                        cachedBlocks.TryRemove(del.N, out remove);
                     }
 
                     result[blockcopy - v1] = b.Data;

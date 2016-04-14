@@ -2,7 +2,7 @@
 {
     using System;
 
-    public interface IBlockStream : IDisposable
+    public interface IBlockReaderWriter : IDisposable
     {
         Action OnClose { get; set; }
 

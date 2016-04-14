@@ -193,7 +193,6 @@
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <None Include="ACDDokanNet.pfx" />
     <None Include="CloudHold.pfx" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
