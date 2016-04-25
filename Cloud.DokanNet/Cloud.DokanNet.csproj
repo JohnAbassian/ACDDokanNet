@@ -87,15 +87,18 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AbsoluteCache.cs" />
+    <Compile Include="AbsoluteCachedBlockReaderWriter.cs" />
+    <Compile Include="AbsoluteCacheItem.cs" />
     <Compile Include="AbstractReaderWriter.cs" />
     <Compile Include="Block.cs" />
-    <Compile Include="BufferedHttpCloudBlockReader.cs" />
+    <Compile Include="BlockingQueue.cs" />
     <Compile Include="ByteArrayBlockReader.cs" />
     <Compile Include="Downloader.cs" />
     <Compile Include="DummyBlockReaderWriter.cs" />
     <Compile Include="FileBlockReader.cs" />
     <Compile Include="FSProvider.cs" />
     <Compile Include="HardLink.cs" />
+    <Compile Include="IAbsoluteCacheItem.cs" />
     <Compile Include="IBlockReaderWriter.cs" />
     <Compile Include="ItemsTreeCache.cs" />
     <Compile Include="NativeMethods.cs" />

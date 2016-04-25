@@ -1,21 +1,24 @@
 ﻿namespace Azi.Cloud.DokanNet
 {
     using System;
+    using System.Diagnostics.Contracts;
     using System.IO;
     using System.Threading;
     using System.Threading.Tasks;
     using Nito.AsyncEx;
 
-    public class Block
+    public class Block : IDisposable
     {
+        private readonly IAbsoluteCacheItem item;
+        private int currentSize;
         private DateTime? lastUpdate;
 
+        private AsyncAutoResetEvent updateEvent = new AsyncAutoResetEvent(false);
         private object updateSync = new object();
 
-        private AsyncAutoResetEvent updateEvent = new AsyncAutoResetEvent(false);
-
-        internal Block(long n, int expectedSize)
+        public Block(IAbsoluteCacheItem item, long n, int expectedSize)
         {
+            this.item = item;
             BlockIndex = n;
             Data = new byte[expectedSize];
             lastUpdate = DateTime.UtcNow;
@@ -23,25 +26,37 @@
 
         public long BlockIndex { get; }
 
-        public bool Complete { get; } = false;
-
-        public int CurrentSize { get; } = 0;
+        public int CurrentSize => currentSize;
 
         public byte[] Data { get; }
 
+        public bool IsComplete { get; private set; } = false;
+
         public DateTime? LastUpdate => lastUpdate;
 
-        public async Task<int> AddBytesFromStream(Stream stream) => await AddBytesFromStream(stream, CancellationToken.None).ConfigureAwait(false);
+        internal int RefCounter { get; set; }
 
-        public async Task<int> AddBytesFromStream(Stream stream, CancellationToken token)
+        public void Dispose()
         {
-            var red = await stream.ReadAsync(Data, CurrentSize, Data.Length - CurrentSize, token).ConfigureAwait(false);
+            item.ReleaseBlock(this);
+        }
 
-            lock (updateSync)
-            {
-                lastUpdate = DateTime.UtcNow;
-                updateEvent.Set();
-            }
+        public void MakeComplete()
+        {
+            IsComplete = true;
+            Update();
+        }
+
+        public async Task<int> ReadFromStream(Stream stream) => await ReadFromStream(stream, CancellationToken.None).ConfigureAwait(false);
+
+        public async Task<int> ReadFromStream(Stream stream, CancellationToken token)
+        {
+            Contract.Ensures(!IsComplete);
+
+            var red = await stream.ReadAsync(Data, CurrentSize, Data.Length - CurrentSize, token).ConfigureAwait(false);
+            Interlocked.Add(ref currentSize, red);
+
+            Update();
 
             return red;
         }
@@ -54,7 +69,7 @@
             {
                 lock (updateSync)
                 {
-                    if (lastUpdate != null && lastUpdate > prevUpdate)
+                    if (IsComplete || (lastUpdate != null && lastUpdate > prevUpdate))
                     {
                         return lastUpdate.Value;
                     }
@@ -63,6 +78,15 @@
                 await updateEvent.WaitAsync(token).ConfigureAwait(false);
             }
             while (true);
+        }
+
+        private void Update()
+        {
+            lock (updateSync)
+            {
+                lastUpdate = DateTime.UtcNow;
+                updateEvent.Set();
+            }
         }
     }
 }

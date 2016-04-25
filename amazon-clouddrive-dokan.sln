@@ -1,10 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
+VisualStudioVersion = 14.0.25123.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cloud.DokanNet", "amazon-clouddrive-dokan\Cloud.DokanNet.csproj", "{213AA535-DB16-4CF9-B3F1-324FF9347F8D}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F031D0CA-AD7C-4355-838D-CD12011F987C}"
 	ProjectSection(SolutionItems) = preProject
 		Build.md = Build.md
@@ -29,8 +27,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "images", "images", "{C40D9D
 		ACD.DokanNet.Gui\images\cd_icon.png = ACD.DokanNet.Gui\images\cd_icon.png
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cloud.DokanNet.Tests", "amazon-clouddrive-dokanTests\Cloud.DokanNet.Tests.csproj", "{07444044-FB75-4639-AF4B-044A48EAD482}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cloud.ShellExtension", "ShellExtension\Cloud.ShellExtension.csproj", "{8DAC61EF-E07B-4BD2-8D79-5865EF2799BB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShellExtension.Tests", "ShellExtension.Tests\ShellExtension.Tests.csproj", "{925A9045-6E71-422D-A3D5-4E4F852C438D}"
@@ -43,16 +39,16 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Clouds", "Clouds", "{A02FE3
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MicrosoftOneDrive", "MicrosoftOneDrive\MicrosoftOneDrive.csproj", "{88E3C06F-D698-44B4-8A20-7951F786AE20}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cloud.DokanNet", "Cloud.DokanNet\Cloud.DokanNet.csproj", "{213AA535-DB16-4CF9-B3F1-324FF9347F8D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cloud.DokanNetTests", "Cloud.DokanNetTests\Cloud.DokanNetTests.csproj", "{9966F630-5DA4-4FF2-94E3-865D20710259}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{213AA535-DB16-4CF9-B3F1-324FF9347F8D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{213AA535-DB16-4CF9-B3F1-324FF9347F8D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{213AA535-DB16-4CF9-B3F1-324FF9347F8D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{213AA535-DB16-4CF9-B3F1-324FF9347F8D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{199CDB28-7472-41BD-BB1F-BF345451A68D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{199CDB28-7472-41BD-BB1F-BF345451A68D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{199CDB28-7472-41BD-BB1F-BF345451A68D}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -63,10 +59,6 @@ Global
 		{B1639C0F-0459-4690-87AE-66EBED228F0F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{CD0ECDAA-982F-4E35-8BA9-E319D8D1F95F}.Debug|Any CPU.ActiveCfg = Debug
 		{CD0ECDAA-982F-4E35-8BA9-E319D8D1F95F}.Release|Any CPU.ActiveCfg = Release
-		{07444044-FB75-4639-AF4B-044A48EAD482}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{07444044-FB75-4639-AF4B-044A48EAD482}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{07444044-FB75-4639-AF4B-044A48EAD482}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{07444044-FB75-4639-AF4B-044A48EAD482}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8DAC61EF-E07B-4BD2-8D79-5865EF2799BB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{8DAC61EF-E07B-4BD2-8D79-5865EF2799BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8DAC61EF-E07B-4BD2-8D79-5865EF2799BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -87,6 +79,14 @@ Global
 		{88E3C06F-D698-44B4-8A20-7951F786AE20}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{88E3C06F-D698-44B4-8A20-7951F786AE20}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{88E3C06F-D698-44B4-8A20-7951F786AE20}.Release|Any CPU.Build.0 = Release|Any CPU
+		{213AA535-DB16-4CF9-B3F1-324FF9347F8D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{213AA535-DB16-4CF9-B3F1-324FF9347F8D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{213AA535-DB16-4CF9-B3F1-324FF9347F8D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{213AA535-DB16-4CF9-B3F1-324FF9347F8D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9966F630-5DA4-4FF2-94E3-865D20710259}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9966F630-5DA4-4FF2-94E3-865D20710259}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9966F630-5DA4-4FF2-94E3-865D20710259}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9966F630-5DA4-4FF2-94E3-865D20710259}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

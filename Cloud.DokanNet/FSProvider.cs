@@ -14,9 +14,13 @@
 
     public class FSProvider : IDisposable
     {
+        private const int BlockSize = 1024 * 1024;
+
         private readonly IHttpCloud cloud;
 
         private readonly ItemsTreeCache itemsTreeCache = new ItemsTreeCache();
+
+        private AbsoluteCache absoluteCache;
 
         private string cachePath;
 
@@ -31,6 +35,7 @@
         public FSProvider(IHttpCloud cloud)
         {
             this.cloud = cloud;
+
             SmallFilesCache = new SmallFilesCache(cloud);
             SmallFilesCache.OnDownloadStarted = (id) =>
             {
@@ -139,6 +144,13 @@
                 {
                     SmallFilesCache.Clear().Wait();
                 }
+
+                if (absoluteCache != null)
+                {
+                    absoluteCache.Dispose();
+                }
+
+                absoluteCache = new AbsoluteCache(cloud, BlockSize, cachePath);
 
                 cachePath = val;
                 SmallFilesCache.CachePath = val;
@@ -252,7 +264,7 @@
 
                 Interlocked.Increment(ref downloadingCount);
                 OnStatisticsUpdated?.Invoke(downloadingCount, uploadingCount);
-                var buffered = new BufferedHttpCloudBlockReader(item, cloud);
+                var buffered = new AbsoluteCachedBlockReaderWriter(item, absoluteCache);
                 buffered.OnClose = () =>
                   {
                       Interlocked.Decrement(ref downloadingCount);
