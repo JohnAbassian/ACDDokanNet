@@ -110,7 +110,7 @@
         {
             try
             {
-                var node = await amazon.Nodes.CreateFolder(parentid, name);
+                var node = await amazon.Nodes.CreateFolder(parentid, name).ConfigureAwait(false);
                 return FromNode(node);
             }
             catch (Exception ex)
@@ -123,7 +123,7 @@
         {
             try
             {
-                return await amazon.Files.Download(id, result, offset, pos, left);
+                return await amazon.Files.Download(id, result, offset, pos, left).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -135,7 +135,7 @@
         {
             try
             {
-                var nodes = await amazon.Nodes.GetChildren(id);
+                var nodes = await amazon.Nodes.GetChildren(id).ConfigureAwait(false);
                 return nodes.Where(n => FsItemKinds.Contains(n.kind) && n.status == AmazonNodeStatus.AVAILABLE).Select(n => FromNode(n)).ToList();
             }
             catch (Exception ex)
@@ -148,7 +148,7 @@
         {
             try
             {
-                return FromNode(await amazon.Nodes.Move(itemId, oldParentId, newParentId));
+                return FromNode(await amazon.Nodes.Move(itemId, oldParentId, newParentId).ConfigureAwait(false));
             }
             catch (Exception ex)
             {
@@ -160,7 +160,7 @@
         {
             try
             {
-                return FromNode(await amazon.Nodes.Rename(id, newName));
+                return FromNode(await amazon.Nodes.Rename(id, newName).ConfigureAwait(false));
             }
             catch (Exception ex)
             {
@@ -172,7 +172,7 @@
         {
             try
             {
-                return FromNode(await amazon.Nodes.GetRoot());
+                return FromNode(await amazon.Nodes.GetRoot().ConfigureAwait(false));
             }
             catch (Exception ex)
             {
@@ -184,7 +184,7 @@
         {
             try
             {
-                await amazon.Nodes.Trash(id);
+                await amazon.Nodes.Trash(id).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -196,7 +196,7 @@
         {
             try
             {
-                await amazon.Nodes.Remove(parentId, itemId);
+                await amazon.Nodes.Remove(parentId, itemId).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -208,7 +208,7 @@
         {
             try
             {
-                var node = await amazon.Nodes.GetNode(id);
+                var node = await amazon.Nodes.GetNode(id).ConfigureAwait(false);
                 if (node == null)
                 {
                     return null;
@@ -226,7 +226,7 @@
         {
             try
             {
-                var node = await amazon.Nodes.GetChild(id, name);
+                var node = await amazon.Nodes.GetChild(id, name).ConfigureAwait(false);
                 if (node == null)
                 {
                     return null;
@@ -273,7 +273,7 @@
         {
             try
             {
-                return FromNode(await amazon.Files.UploadNew(parentId, fileName, p));
+                return FromNode(await amazon.Files.UploadNew(parentId, fileName, p).ConfigureAwait(false));
             }
             catch (Exception ex)
             {
@@ -285,7 +285,7 @@
         {
             try
             {
-                return FromNode(await amazon.Files.Overwrite(id, p));
+                return FromNode(await amazon.Files.Overwrite(id, p).ConfigureAwait(false));
             }
             catch (Exception ex)
             {
@@ -297,7 +297,7 @@
         {
             try
             {
-                var node = await amazon.Nodes.GetNodeExtended(id);
+                var node = await amazon.Nodes.GetNodeExtended(id).ConfigureAwait(false);
                 var info = new CloudDokanNetItemInfo
                 {
                     Id = id,
@@ -334,7 +334,7 @@
             dlg.Cancellation = cts;
             dlg.Show();
 
-            var result = await amazon.AuthenticationByExternalBrowser(CloudDriveScopes.ReadAll | CloudDriveScopes.Write, TimeSpan.FromMinutes(10), cts.Token);
+            var result = await amazon.AuthenticationByExternalBrowser(CloudDriveScopes.ReadAll | CloudDriveScopes.Write, TimeSpan.FromMinutes(10), cts.Token).ConfigureAwait(false);
 
             dlg.Close();
             cs.ThrowIfCancellationRequested();
@@ -348,7 +348,7 @@
             return await amazon.AuthenticationByTokens(
             authinfo.AuthToken,
             authinfo.AuthRenewToken,
-            authinfo.AuthTokenExpiration);
+            authinfo.AuthTokenExpiration).ConfigureAwait(false);
         }
 
         Task<string> IHttpCloudNodes.ShareNode(string id, NodeShareType type)
@@ -358,7 +358,7 @@
 
         public async Task SignOut(string save)
         {
-            await Task.FromResult(0);
+            await Task.FromResult(0).ConfigureAwait(false);
         }
 
         /// <summary>

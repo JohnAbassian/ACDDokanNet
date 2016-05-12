@@ -71,6 +71,24 @@ namespace Azi.Cloud.DokanNet.Gui.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Number of files currently downloading..
+        /// </summary>
+        public static string FilesDownloadingTooltip {
+            get {
+                return ResourceManager.GetString("FilesDownloadingTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Number of files currently uploading. If you close application while it&apos;s not zero files will be reuploaded on next launch, but current upload progress will be lost..
+        /// </summary>
+        public static string FilesUploadingTooltip {
+            get {
+                return ResourceManager.GetString("FilesUploadingTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Log file may contain some private information like folder and file names. But application does not know your email or Amazon Cloud Drive password.
         ///You can open log file in standard Windows Event Viewer just double clicking the file..
         /// </summary>
@@ -81,7 +99,16 @@ namespace Azi.Cloud.DokanNet.Gui.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Maximum size of files which will be cached whole on first request..
+        ///   Looks up a localized string similar to Size of all small files which will be cached..
+        /// </summary>
+        public static string SmallFileCacheTooltip {
+            get {
+                return ResourceManager.GetString("SmallFileCacheTooltip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Maximum size of files which will be cached whole on first request. Files bigger will not be cached and can be very slow..
         /// </summary>
         public static string SmallFileSizeTooltip {
             get {

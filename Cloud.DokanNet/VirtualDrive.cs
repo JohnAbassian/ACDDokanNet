@@ -223,7 +223,6 @@
             }
         }
 
-
         public NtStatus FlushFileBuffers(string fileName, DokanFileInfo info)
         {
             try

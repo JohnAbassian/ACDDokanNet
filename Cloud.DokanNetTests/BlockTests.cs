@@ -34,7 +34,7 @@ namespace Azi.Cloud.DokanNet.Tests
             int lastSize = 0;
             while (!block.IsComplete)
             {
-                await block.WaitUpdate().ConfigureAwait(false);
+                var newUpdate = await block.WaitUpdate(lastUpdate).ConfigureAwait(false);
                 Assert.NotEqual(lastUpdate, newUpdate);
 
                 lastUpdate = newUpdate;

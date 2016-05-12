@@ -1,8 +1,8 @@
-﻿using System.Threading.Tasks;
-using Azi.Cloud.Common;
-
-namespace Azi.Cloud.DokanNet
+﻿namespace Azi.Cloud.DokanNet
 {
+    using System.Threading.Tasks;
+    using Azi.Cloud.Common;
+
     public interface IAbsoluteCacheItem
     {
         FSItem FSItem { get; }

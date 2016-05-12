@@ -19,15 +19,9 @@
     /// </summary>
     public partial class App : Application, IDisposable
     {
+        public event Action<string> OnMountChanged;
+
         public static new App Current => Application.Current as App;
-
-        public FSProvider.StatisticsUpdated OnProviderStatisticsUpdated { get; set; }
-
-        public int UploadingCount => Clouds.Sum(c => c.UploadingCount);
-
-        public int DownloadingCount => Clouds.Sum(c => c.DownloadingCount);
-
-        private ObservableCollection<CloudMount> clouds;
 
         public ObservableCollection<CloudMount> Clouds
         {
@@ -50,26 +44,9 @@
             }
         }
 
-        public event Action<string> OnMountChanged;
+        public int DownloadingCount => Clouds.Sum(c => c.DownloadingCount);
 
-        public long SmallFileSizeLimit
-        {
-            get
-            {
-                return Gui.Properties.Settings.Default.SmallFileSizeLimit;
-            }
-
-            set
-            {
-                // TODO
-                // if (provider != null)
-                // {
-                //    provider.SmallFileSizeLimit = value * (1 << 20);
-                // }
-                Gui.Properties.Settings.Default.SmallFileSizeLimit = value;
-                Gui.Properties.Settings.Default.Save();
-            }
-        }
+        public FSProvider.StatisticsUpdated OnProviderStatisticsUpdated { get; set; }
 
         public string SmallFileCacheFolder
         {
@@ -109,6 +86,27 @@
             }
         }
 
+        public long SmallFileSizeLimit
+        {
+            get
+            {
+                return Gui.Properties.Settings.Default.SmallFileSizeLimit;
+            }
+
+            set
+            {
+                // TODO
+                // if (provider != null)
+                // {
+                //    provider.SmallFileSizeLimit = value * (1 << 20);
+                // }
+                Gui.Properties.Settings.Default.SmallFileSizeLimit = value;
+                Gui.Properties.Settings.Default.Save();
+            }
+        }
+
+        public int UploadingCount => Clouds.Sum(c => c.UploadingCount);
+
         public void AddCloud(AvailableCloudsModel.AvailableCloud selectedItem)
         {
             var name = selectedItem.Name;
@@ -144,48 +142,46 @@
             settings.Save();
         }
 
+        // This code added to correctly implement the disposable pattern.
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+            Dispose(true);
+
+            // TODO: uncomment the following line if the finalizer is overridden above.
+            // GC.SuppressFinalize(this);
+        }
+
+        public void ProviderStatisticsUpdated(CloudInfo cloud, int downloading, int uploading)
+        {
+            OnProviderStatisticsUpdated?.Invoke(downloading, uploading);
+        }
+
+        internal void ClearCache()
+        {
+            // TODO
+            // if (provider != null)
+            // {
+            //    provider.ClearSmallFilesCache();
+            // }
+        }
+
         internal void DeleteCloud(CloudMount cloud)
         {
             Clouds.Remove(cloud);
         }
 
-        private void ProcessArgs(string[] args)
+        internal bool GetAutorun()
         {
-        }
-
-        private NotifyIcon notifyIcon;
-
-        public void ProviderStatisticsUpdated(CloudInfo cloudn, int downloading, int uploading)
-        {
-            OnProviderStatisticsUpdated?.Invoke(downloading, uploading);
-        }
-
-        private void SetupNotifyIcon()
-        {
-            var components = new System.ComponentModel.Container();
-            notifyIcon = new NotifyIcon(components);
-
-            var contextMenu = new ContextMenu(
-                        new MenuItem[]
-                        {
-                            new MenuItem("&Settings", (s, e) => OpenSettings()),
-                            new MenuItem("-"),
-                            new MenuItem("E&xit", (s, e) => MenuExit_Click())
-                        });
-
-            notifyIcon.Icon = Gui.Properties.Resources.app_all;
-            notifyIcon.ContextMenu = contextMenu;
-
-            notifyIcon.Text = $"Amazon Cloud Drive Dokan.NET driver settings.";
-            notifyIcon.Visible = true;
-
-            notifyIcon.MouseClick += (sender, e) =>
+            using (var rk = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true))
             {
-                if (e.Button == MouseButtons.Left)
-                {
-                    ShowBalloon();
-                }
-            };
+                return rk.GetValue(AppName) != null;
+            }
+        }
+
+        internal void NotifyMountChanged(string id)
+        {
+            OnMountChanged?.Invoke(id);
         }
 
         internal void SaveClouds()
@@ -195,46 +191,60 @@
             settings.Save();
         }
 
-        private void ShowBalloon()
+        internal void SetAutorun(bool isChecked)
         {
-            notifyIcon.ShowBalloonTip(5000, "State", $"Downloading: {DownloadingCount}\r\nUploading: {UploadingCount}", ToolTipIcon.None);
-        }
-
-        private void OpenSettings()
-        {
-            MainWindow.Show();
-            MainWindow.Activate();
-        }
-
-        private void MenuExit_Click()
-        {
-            if (UploadingCount > 0)
+            using (var rk = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true))
             {
-                if (System.Windows.MessageBox.Show("Some files are not uploaded yet", "Are you sure?", MessageBoxButton.YesNo) != MessageBoxResult.Yes)
+                if (isChecked)
                 {
-                    return;
+                    var uri = new Uri(Assembly.GetExecutingAssembly().CodeBase);
+                    var path = uri.LocalPath + Uri.UnescapeDataString(uri.Fragment).Replace("/", "\\");
+                    rk.SetValue(AppName, $"\"{path}\" /mount");
+                }
+                else
+                {
+                    rk.DeleteValue(AppName, false);
                 }
             }
-
-            shuttingdown = true;
-            Shutdown();
         }
 
-        private Mutex startedMutex;
-        private bool shuttingdown = false;
-
-        private async Task MountDefault()
+        protected virtual void Dispose(bool disposing)
         {
-            foreach (var cloud in Clouds.Where(c => c.CloudInfo.AutoMount))
+            if (!disposedValue)
             {
-                try
+                if (disposing)
                 {
-                    await cloud.MountAsync(false);
+                    startedMutex.Dispose();
+                    if (notifyIcon != null)
+                    {
+                        notifyIcon.Dispose();
+                    }
                 }
-                catch (Exception ex)
-                {
-                    Log.Error(ex);
-                }
+
+                // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
+                // TODO: set large fields to null.
+                disposedValue = true;
+            }
+        }
+
+        private const string AppName = "ACDDokanNet";
+        private ObservableCollection<CloudMount> clouds;
+        private bool disposedValue = false;
+        private NotifyIcon notifyIcon;
+        private bool shuttingdown = false;
+        private Mutex startedMutex;
+
+        private void Application_Exit(object sender, ExitEventArgs e)
+        {
+            if (notifyIcon != null)
+            {
+                notifyIcon.Dispose();
+                notifyIcon = null;
+            }
+
+            foreach (var cloud in Clouds)
+            {
+                cloud.UnmountAsync().Wait(500);
             }
         }
 
@@ -270,7 +280,7 @@
 
             if (GetAutorun())
             {
-                await MountDefault();
+                await MountDefault().ConfigureAwait(false);
             }
 
             if (e.Args.Length > 0)
@@ -282,90 +292,78 @@
             MainWindow.Show();
         }
 
-        internal void ClearCache()
+        private void MenuExit_Click()
         {
-            // TODO
-            // if (provider != null)
-            // {
-            //    provider.ClearSmallFilesCache();
-            // }
-        }
-
-        private const string AppName = "ACDDokanNet";
-
-        internal void SetAutorun(bool isChecked)
-        {
-            using (var rk = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true))
+            if (UploadingCount > 0)
             {
-                if (isChecked)
+                if (System.Windows.MessageBox.Show("Some files are not uploaded yet", "Are you sure?", MessageBoxButton.YesNo) != MessageBoxResult.Yes)
                 {
-                    var uri = new Uri(Assembly.GetExecutingAssembly().CodeBase);
-                    var path = uri.LocalPath + Uri.UnescapeDataString(uri.Fragment).Replace("/", "\\");
-                    rk.SetValue(AppName, $"\"{path}\" /mount");
-                }
-                else
-                {
-                    rk.DeleteValue(AppName, false);
+                    return;
                 }
             }
+
+            shuttingdown = true;
+            Shutdown();
         }
 
-        internal bool GetAutorun()
+        private async Task MountDefault()
         {
-            using (var rk = Registry.CurrentUser.OpenSubKey("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true))
+            foreach (var cloud in Clouds.Where(c => c.CloudInfo.AutoMount))
             {
-                return rk.GetValue(AppName) != null;
-            }
-        }
-
-        private void Application_Exit(object sender, ExitEventArgs e)
-        {
-            if (notifyIcon != null)
-            {
-                notifyIcon.Dispose();
-                notifyIcon = null;
-            }
-
-            foreach (var cloud in Clouds)
-            {
-                cloud.UnmountAsync().Wait(500);
-            }
-        }
-
-        internal void NotifyMountChanged(string id)
-        {
-            OnMountChanged?.Invoke(id);
-        }
-
-        private bool disposedValue = false; // To detect redundant calls
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!disposedValue)
-            {
-                if (disposing)
+                try
                 {
-                    startedMutex.Dispose();
-                    if (notifyIcon != null)
-                    {
-                        notifyIcon.Dispose();
-                    }
+                    await cloud.MountAsync(false).ConfigureAwait(false);
                 }
-
-                // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
-                // TODO: set large fields to null.
-                disposedValue = true;
+                catch (Exception ex)
+                {
+                    Log.Error(ex);
+                }
             }
         }
 
-        // This code added to correctly implement the disposable pattern.
-        public void Dispose()
+        private void OpenSettings()
         {
-            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
-            Dispose(true);
-
-            // TODO: uncomment the following line if the finalizer is overridden above.
-            // GC.SuppressFinalize(this);
+            MainWindow.Show();
+            MainWindow.Activate();
         }
+
+        private void ProcessArgs(string[] args)
+        {
+        }
+
+        private void SetupNotifyIcon()
+        {
+            var components = new System.ComponentModel.Container();
+            notifyIcon = new NotifyIcon(components);
+
+            var contextMenu = new ContextMenu(
+                        new MenuItem[]
+                        {
+                            new MenuItem("&Settings", (s, e) => OpenSettings()),
+                            new MenuItem("-"),
+                            new MenuItem("E&xit", (s, e) => MenuExit_Click())
+                        });
+
+            notifyIcon.Icon = Gui.Properties.Resources.app_all;
+            notifyIcon.ContextMenu = contextMenu;
+
+            notifyIcon.Text = $"Amazon Cloud Drive Dokan.NET driver settings.";
+            notifyIcon.Visible = true;
+
+            notifyIcon.MouseClick += (sender, e) =>
+            {
+                if (e.Button == MouseButtons.Left)
+                {
+                    ShowBalloon();
+                }
+            };
+        }
+
+        private void ShowBalloon()
+        {
+            notifyIcon.ShowBalloonTip(5000, "State", $"Downloading: {DownloadingCount}\r\nUploading: {UploadingCount}", ToolTipIcon.None);
+        }
+
+        // To detect redundant calls
     }
 }

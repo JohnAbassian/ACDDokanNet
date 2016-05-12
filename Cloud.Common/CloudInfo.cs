@@ -108,9 +108,9 @@
             }
         }
 
-        internal void OnPropertyChanged(string name)
+        public void OnPropertyChanged(string propname)
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propname));
         }
     }
 }

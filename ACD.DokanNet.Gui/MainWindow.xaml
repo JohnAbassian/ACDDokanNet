@@ -54,10 +54,10 @@
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
                     <Label Content="Files downloading" Grid.Row="0" ToolTip="{x:Static p:Resources.SmallFileSizeTooltip}" Padding="5,5,5,0"/>
-                    <TextBox IsReadOnly="True" Text="{Binding Mode=OneWay, Path=DownloadingFilesCount}" Grid.Row="0" Grid.Column="1" MaxLines="1" Margin="1,5,0,0" ToolTip="{x:Static p:Resources.SmallFileSizeTooltip}"/>
+                    <TextBox IsReadOnly="True" Text="{Binding Mode=OneWay, Path=DownloadingFilesCount}" Grid.Row="0" Grid.Column="1" MaxLines="1" Margin="1,5,0,0" ToolTip="{x:Static p:Resources.FilesDownloadingTooltip}"/>
 
                     <Label Content="Files uploading" Grid.Row="1" ToolTip="{x:Static p:Resources.SmallFileSizeTooltip}" Padding="5,5,5,0"/>
-                    <TextBox IsReadOnly="True" Text="{Binding Mode=OneWay, Path=UploadingFilesCount}" Grid.Row="1" Grid.Column="1" MaxLines="1" Margin="1,5,0,0" ToolTip="{x:Static p:Resources.SmallFileSizeTooltip}"/>
+                    <TextBox IsReadOnly="True" Text="{Binding Mode=OneWay, Path=UploadingFilesCount}" Grid.Row="1" Grid.Column="1" MaxLines="1" Margin="1,5,0,0" ToolTip="{x:Static p:Resources.FilesUploadingTooltip}"/>
 
                 </Grid>
             </GroupBox>
@@ -94,7 +94,7 @@
                         <TextBox Text="{Binding SmallFileSizeLimit}" Grid.Row="2" Grid.Column="2" MaxLines="1" Margin="0,5,0,0" ToolTip="{x:Static p:Resources.SmallFileSizeTooltip}"/>
 
                         <Label Content="Small files cache, Mb" Grid.Row="3" ToolTip="{x:Static p:Resources.SmallFileSizeTooltip}" Grid.ColumnSpan="2" Padding="5,5,5,0"/>
-                        <TextBox Text="{Binding SmallFilesCacheSize}" Grid.Row="3" Grid.Column="2" MaxLines="1" Margin="0,5,0,0" ToolTip="{x:Static p:Resources.SmallFileSizeTooltip}"/>
+                        <TextBox Text="{Binding SmallFilesCacheSize}" Grid.Row="3" Grid.Column="2" MaxLines="1" Margin="0,5,0,0" ToolTip="{x:Static p:Resources.SmallFileCacheTooltip}"/>
 
                         <Label Content="Read only" Grid.Row="4"/>
                         <CheckBox Grid.Row="4" VerticalAlignment="Center" IsChecked="{Binding ReadOnly}" IsEnabled="{Binding CanMount}" HorizontalAlignment="Center" Grid.Column="2"/>

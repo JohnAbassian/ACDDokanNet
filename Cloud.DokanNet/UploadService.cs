@@ -202,7 +202,7 @@
                     return;
                 }
 
-                Task.Run(async () => await Upload(uploadCopy));
+                Task.Run(async () => await Upload(uploadCopy).ConfigureAwait(false));
             }
         }
 
@@ -251,7 +251,7 @@
                 FSItem.Builder node;
                 if (!item.Overwrite)
                 {
-                    var checknode = await cloud.Nodes.GetNode(item.ParentId);
+                    var checknode = await cloud.Nodes.GetNode(item.ParentId).ConfigureAwait(false);
                     if (checknode == null || !checknode.IsDir)
                     {
                         Log.Error("Folder does not exist to upload file: " + item.Path);
@@ -263,11 +263,11 @@
                     node = await cloud.Files.UploadNew(
                         item.ParentId,
                         Path.GetFileName(item.Path),
-                        () => new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite, 4096, true));
+                        () => new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite, 4096, true)).ConfigureAwait(false);
                 }
                 else
                 {
-                    var checknode = await cloud.Nodes.GetNode(item.Id);
+                    var checknode = await cloud.Nodes.GetNode(item.Id).ConfigureAwait(false);
                     if (checknode == null)
                     {
                         Log.Error("File does not exist to be overwritten: " + item.Path);
@@ -278,7 +278,7 @@
 
                     node = await cloud.Files.Overwrite(
                         item.Id,
-                        () => new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite, 4096, true));
+                        () => new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite, 4096, true)).ConfigureAwait(false);
                 }
 
                 File.Delete(path + ".info");
@@ -313,7 +313,7 @@
                 uploadLimitSemaphore.Release();
             }
 
-            await Task.Delay(ReuploadDelay);
+            await Task.Delay(ReuploadDelay).ConfigureAwait(false);
             uploads.Add(item);
         }
 

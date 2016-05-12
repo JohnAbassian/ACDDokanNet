@@ -25,11 +25,11 @@
             this.cache = cache;
         }
 
+        public FSItem FSItem { get; }
+
         private int BlockSize => cache.BlockSize;
 
         private IHttpCloud Cloud => cache.Cloud;
-
-        public FSItem FSItem { get; }
 
         private int NumberOfBlocks => (int)((FSItem.Length - 1) / cache.BlockSize) + 1;
 

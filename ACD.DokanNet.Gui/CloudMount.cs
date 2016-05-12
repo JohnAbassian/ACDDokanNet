@@ -15,6 +15,7 @@
     public class CloudMount : INotifyPropertyChanged, IDisposable, IAuthUpdateListener
     {
         private readonly CloudInfo cloudInfo;
+        private readonly string dokanyVersionRequired = "1.1.0.0-rc3";
 
         private ManualResetEventSlim unmountingEvent;
 
@@ -277,6 +278,10 @@
                                 lastException = ex;
                                 Log.Warn($"Drive letter {letter} is already used");
                             }
+                            catch (DllNotFoundException)
+                            {
+                                throw;
+                            }
                         }
 
                         if (!wasMounted)
@@ -289,6 +294,10 @@
 
                             mountedEvent.SetException(new InvalidOperationException(message));
                         }
+                    }
+                    catch (DllNotFoundException e)
+                    {
+                        mountedEvent.SetException(new InvalidOperationException($"Dokany {dokanyVersionRequired} is not installed or is broken . Please install or reinstall Dokany {dokanyVersionRequired}."));
                     }
                     catch (Exception ex)
                     {
